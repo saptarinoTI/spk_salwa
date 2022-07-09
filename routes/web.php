@@ -18,19 +18,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/', function () {
+    return redirect('login');
+});
 Route::get('login', [HomeController::class, 'login'])->name('login');
 
-Route::prefix('app')->group(function () {
-    // Pendaftaran Siswa
-    // Route::get('/pendaftaran', [PendaftaranSiswaController::class, 'index'])->name('pendaftaran.index');
-    // Route::get('/pendaftaran/create', [PendaftaranSiswaController::class, 'create'])->name('pendaftaran.create');
-    // Route::post('/pendaftaran', [PendaftaranSiswaController::class, 'store'])->name('pendaftaran.store');
 
+Route::prefix('app')->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('app.index');
+    Route::post('pendaftaran/filter', [PendaftaranSiswaController::class, 'filter'])->name('pendaftaran.filter');
     Route::resources([
         'pendaftaran' => PendaftaranSiswaController::class,
         'kriteria' => KriteriaController::class,
     ]);
+
+    Route::post('normalisasi/filter', [NormalisasiController::class, 'filter'])->name('normalisasi.filter');
     Route::get('normalisasi', [NormalisasiController::class, 'index'])->name('normalisasi.index');
+
+    Route::post('peringkat/filter', [PeringkatController::class, 'filter'])->name('peringkat.filter');
     Route::get('peringkat', [PeringkatController::class, 'index'])->name('peringkat.index');
 });

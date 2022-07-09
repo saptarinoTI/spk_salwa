@@ -17,11 +17,6 @@ class NormalisasiModel extends Model
         'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'hasil'
     ];
 
-    public function normal()
-    {
-        return $this->hasOne(NormalisasiModel::class, 'siswa_id', 'id');
-    }
-
     public function siswa()
     {
         return $this->belongsTo(SiswaModel::class, 'siswa_id', 'id');

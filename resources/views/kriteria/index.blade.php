@@ -29,11 +29,6 @@
   <!--begin::Card body-->
   <div class="card-body py-4">
 
-    <div class="d-flex justify-content-between">
-      {{-- @if (Omjin::permission('penilaianCreate')) --}}
-      <a href="{{ route('kriteria.create') }}" data-state="0" id="add" class="btn btn-md btn-outline btn-outline-success btn-active-light-success me-2 hidex"><small>Add</small></a>
-      {{-- @endif --}}
-    </div>
     {{-- 7771235312V451 --}}
     <div class="separator separator-dashed my-4"></div>
 
@@ -48,6 +43,7 @@
                 <th class="fw-bold" style="align-items: center; width: 5px !important;">#</th>
                 <th class="fw-bold" width="70px">Nama Kriteria</th>
                 <th class="fw-bold" width="70px">Nilai Kepentingan</th>
+                <th class="fw-bold" width="70px">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -56,6 +52,9 @@
                 <td>{{ ucwords($p->kode) }}</td>
                 <td>{{ ucwords($p->nama) }}</td>
                 <td>{{ ($p->nilai * 100) }} %</td>
+                <td>
+                  <a href="{{ route('kriteria.edit', $p->kode) }}" data-state="0" id="edit" class="btn btn-md btn-outline btn-outline-warning btn-active-light-warning me-2 hidex"><small>Edit</small></a>
+                </td>
               </tr>
               @endforeach
             </tbody>

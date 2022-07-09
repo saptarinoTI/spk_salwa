@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Data;
 
 use App\Http\Controllers\Controller;
+use App\Models\KriteriaModel;
 use App\Models\NormalisasiModel;
 use App\Models\SiswaModel;
 use Illuminate\Http\Request;
@@ -11,13 +12,36 @@ class PendaftaranSiswaController extends Controller
 {
     public function index()
     {
-        $pend = SiswaModel::all();
+        $pend = [];
         return view('pendaftaran.index', compact('pend'));
     }
 
     public function create()
     {
         return view('pendaftaran.create');
+    }
+
+    public function filter(Request $request, SiswaModel $siswa)
+    {
+        if ($request->jenjang) {
+
+            if ($request->tahun) {
+                $pend = $siswa->where('jenjang', $request->input('jenjang'))
+                    ->where('tahun', $request->input('tahun'))
+                    ->get();
+                return view('pendaftaran.index', compact('pend'));
+            }
+
+            $pend = $siswa->where('jenjang', $request->input('jenjang'))->get();
+            return view('pendaftaran.index', compact('pend'));
+        } elseif ($request->tahun) {
+            $pend = $siswa->where('tahun', $request->input('tahun'))
+                ->get();
+            return view('pendaftaran.index', compact('pend'));
+        }
+
+        $pend = SiswaModel::all();
+        return view('pendaftaran.index', compact('pend'));
     }
 
     public function store(Request $request)
@@ -66,6 +90,7 @@ class PendaftaranSiswaController extends Controller
         }
 
         foreach ($dataPendaftar as $pend) {
+            $kriteria = KriteriaModel::all();
             $newNormal = NormalisasiModel::where('siswa_id', $pend->id)->first();
             if ($newNormal == null) {
                 $normal = new NormalisasiModel();
@@ -77,7 +102,7 @@ class PendaftaranSiswaController extends Controller
                 $normal->c5 = ((float)(min($c5)) / $pend['pengeluaran_bln']);
                 $normal->c6 = ((float)(min($c6)) / $pend['hutang_bnk']);
                 $normal->c7 = ((float)(min($c7)) / $pend['hutang_lain']);
-                $normal->hasil = ($normal->c1 * 0.2) + ($normal->c2 * 0.15) + ($normal->c3 * 0.15) + ($normal->c4 * 0.15) + ($normal->c5 * 0.15) + ($normal->c6 * 0.1) + ($normal->c7 * 0.1);
+                $normal->hasil = ($normal->c1 * $kriteria['0']['nilai']) + ($normal->c2 * $kriteria['1']['nilai']) + ($normal->c3 * $kriteria['2']['nilai']) + ($normal->c4 * $kriteria['3']['nilai']) + ($normal->c5 * $kriteria['4']['nilai']) + ($normal->c6 * $kriteria['5']['nilai']) + ($normal->c7 * $kriteria['6']['nilai']);
                 $normal->save();
             } else {
                 $newNormal->c1 = ((float)(min($c1) / $pend['kondisi_ortu']));
@@ -87,7 +112,7 @@ class PendaftaranSiswaController extends Controller
                 $newNormal->c5 = ((float)(min($c5)) / $pend['pengeluaran_bln']);
                 $newNormal->c6 = ((float)(min($c6)) / $pend['hutang_bnk']);
                 $newNormal->c7 = ((float)(min($c7)) / $pend['hutang_lain']);
-                $newNormal->hasil = ($newNormal->c1 * 0.2) + ($newNormal->c2 * 0.15) + ($newNormal->c3 * 0.15) + ($newNormal->c4 * 0.15) + ($newNormal->c5 * 0.15) + ($newNormal->c6 * 0.1) + ($newNormal->c7 * 0.1);
+                $newNormal->hasil = ($newNormal->c1 * $kriteria['0']['nilai']) + ($newNormal->c2 * $kriteria['1']['nilai']) + ($newNormal->c3 * $kriteria['2']['nilai']) + ($newNormal->c4 * $kriteria['3']['nilai']) + ($newNormal->c5 * $kriteria['4']['nilai']) + ($newNormal->c6 * $kriteria['5']['nilai']) + ($newNormal->c7 * $kriteria['6']['nilai']);
                 $newNormal->save();
             }
         }

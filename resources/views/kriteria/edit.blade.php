@@ -29,12 +29,13 @@
   <!--begin::Card body-->
   <div class="card-body py-4">
 
-    <form action="{{ route('kriteria.store') }}" method="POST">
+    <form action="{{ route('kriteria.update', $kriteria->kode) }}" method="POST">
       @csrf
+      @method('patch')
       <div class="form-group row fv-row mb-5">
         <label for="example-text-input" class="col-md-2 col-form-label">Kriteria</label>
         <div class="col-md-10">
-          <input class="form-control form-control-solid @error('kode') is-invalid @enderror" autocomplete="off" id="kode" name="kode" type="text" required>
+          <input class="form-control form-control-solid @error('kode') is-invalid @enderror" autocomplete="off" id="kode" name="kode" type="text" required value="{{ ucwords($kriteria->kode) }}" readonly>
           @error('kode')
           <div class="invalid-feedback">
             {{ $message }}
@@ -46,7 +47,7 @@
       <div class="form-group row fv-row mb-5">
         <label for="example-text-input" class="col-md-2 col-form-label">Nama Kriteria</label>
         <div class="col-md-10">
-          <input class="form-control form-control-solid @error('nama') is-invalid @enderror" autocomplete="off" id="nama" name="nama" type="text" required>
+          <input class="form-control form-control-solid @error('nama') is-invalid @enderror" autocomplete="off" id="nama" name="nama" type="text" required readonly value="{{ ucwords($kriteria->nama) }}">
           @error('nama')
           <div class="invalid-feedback">
             {{ $message }}
@@ -58,7 +59,7 @@
       <div class="form-group row fv-row mb-5">
         <label for="example-text-input" class="col-md-2 col-form-label">Nilai Kepentingan</label>
         <div class="col-md-9">
-          <input class="form-control form-control-solid @error('nilai') is-invalid @enderror" autocomplete="off" id="nilai" name="nilai" type="number" required>
+          <input class="form-control form-control-solid @error('nilai') is-invalid @enderror" autocomplete="off" id="nilai" name="nilai" type="number" required value="{{ $kriteria->nilai * 100}}">
           @error('nilai')
           <div class="invalid-feedback">
             {{ $message }}
@@ -73,7 +74,7 @@
 
       <div class="separator separator-dashed my-4"></div>
       <div class="d-flex justify-content-end">
-        <button type="reset" click="resetForm" class="btn btn-light btn-lg me-2 w-100 mb-5">Reset</button>
+        <a href="{{ route('kriteria.index') }}" click="resetForm" class="btn btn-light btn-lg me-2 w-100 mb-5">Kembali</a>
         <button type="submit" class="btn btn-lg btn-primary ms-2 w-100 mb-5">Save</button>
       </div>
     </form>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Data;
 
 use App\Http\Controllers\Controller;
 use App\Models\KriteriaModel;
+use App\Models\SiswaModel;
 use Illuminate\Http\Request;
 
 class KriteriaController extends Controller
@@ -14,25 +15,27 @@ class KriteriaController extends Controller
         return view('kriteria.index', compact('daftarKri'));
     }
 
-    public function create()
+    public function edit($id)
     {
-        return view('kriteria.create');
+        $kriteria = KriteriaModel::findOrFail($id);
+        return view('kriteria.edit', compact('kriteria'));
     }
 
-    public function store(Request $request)
+    public function update(Request $request, $id)
     {
         // dd($request->all());
         $request->validate([
-            'kode' => 'required|unique:kriteria,kode',
+            'kode' => 'required',
             'nama' => 'required',
             'nilai' => 'required|numeric'
         ]);
         $newKriteria = (htmlspecialchars($request->nilai) / 100);
-        $kriteria = new KriteriaModel();
-        $kriteria->kode = strtolower(htmlspecialchars($request->kode));
-        $kriteria->nama = strtolower(htmlspecialchars($request->nama));
-        $kriteria->nilai = $newKriteria;
-        $kriteria->save();
+        $kriteria = KriteriaModel::findOrFail($id);
+        $kriteria->update([
+            'nilai' => $newKriteria,
+        ]);
+
+        $pendaftaran = new SiswaModel();
         return redirect()->route('kriteria.index');
     }
 }

@@ -1,5 +1,5 @@
 <div class="menu-item me-lg-1">
-  <a href="." class="menu-link py-3">
+  <a href="{{ route('app.index') }}" class="menu-link py-3">
     <span class="menu-title">Dashboard</span>
   </a>
 </div>

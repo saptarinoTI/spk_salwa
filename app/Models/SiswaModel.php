@@ -16,4 +16,9 @@ class SiswaModel extends Model
     protected $fillable = [
         'pendaftar', 'jenjang', 'kondisi_ortu', 'penghasilan_ortu', 'kepemilikan_rmh', 'kepemilikan_hrt', 'pengeluaran_bln', 'hutang_bnk', 'hutang_lain', 'tahun'
     ];
+
+    public function normal()
+    {
+        return $this->hasOne(NormalisasiModel::class, 'siswa_id', 'id');
+    }
 }

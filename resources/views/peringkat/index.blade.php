@@ -21,19 +21,19 @@
   <div class="card-header border-0 pt-6">
     <!--begin::Card title-->
     <div class="card-title flex-column">
-      <h2 class="mb-1">Data Normalisasi</h2>
+      <h2 class="mb-1">Data Peringkat</h2>
     </div>
 
-    <form action="." method="get" class="d-flex">
+    <form action="{{ route('peringkat.filter') }}" method="POST" class="d-flex">
       @csrf
-      <select name="jenjang" id="jenjang" class="form-select form-select-solid s2x mx-2">
-        <option>Pilih jenjang ...</option>
+      <select name="jenjang" id="jenjang" class="form-select form-select-solid s2x mx-2" required>
+        <option value="">Pilih jenjang ...</option>
         <option value="sd">Sekolah Dasar</option>
         <option value="smp">Sekolah Menegah Pertama</option>
         <option value="sma">Sekolah Menegah Atas</option>
       </select>
-      <select name="tahun" id="tahun" class="form-select form-select-solid s2x mx-2">
-        <option>Pilih Tahun ...</option>
+      <select name="tahun" id="tahun" class="form-select form-select-solid s2x mx-2" required>
+        <option value="">Pilih Tahun ...</option>
         @php
         for($i=date('Y'); $i>=date('Y')-2; $i-=1){
         echo "<option value='$i'> $i </option>";
@@ -55,14 +55,6 @@
     {{-- 7771235312V451 --}}
     <div class="separator separator-dashed my-4"></div>
 
-    <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6" style="display:none;">
-      <li class="nav-item">
-        <a class="nav-link active" id="dataxtbl-tab" data-bs-toggle="tab" href="#dataxtbl">Link 1</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="formx-tab" data-bs-toggle="tab" href="#formx">Link 2</a>
-      </li>
-    </ul>
 
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane fade show active" id="dataxtbl" role="tabpanel">
@@ -71,20 +63,26 @@
 
           <table class="table table-row-bordered display nowrap" id="tblpenilaian" style="width:100%">
             <thead>
+              @if (!$dataPendaftar == [])
               <tr>
-                <th class="fw-bold" style="align-items: center; width: 5px !important;">#</th>
                 <th class="fw-bold" width="1px">Kode Pendaftaran</th>
                 <th class="fw-bold" width="70px">Preverensi</th>
               </tr>
+              @endif
             </thead>
             <tbody>
-              @foreach ($dataPendaftar as $pend)
+              @forelse ($dataPendaftar as $pend)
               <tr>
-                <td>{{ $pend['id'] }}</td>
                 <td>{{ strtoupper($pend->siswa->pendaftar) }}</td>
                 <td>{{ $pend->hasil }}</td>
               </tr>
-              @endforeach
+              @empty
+              @if (!$dataPendaftar == [])
+              <tr class="text-center fw-bolder">
+                <td colspan="3">Data Tidak Tersedia</td>
+              </tr>
+              @endif
+              @endforelse
             </tbody>
           </table>
 

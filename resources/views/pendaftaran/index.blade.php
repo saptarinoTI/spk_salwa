@@ -32,16 +32,16 @@
     <div class="d-flex justify-content-between">
       {{-- @if (Omjin::permission('penilaianCreate')) --}}
       <a href="{{ route('pendaftaran.create') }}" data-state="0" id="add" class="btn btn-md btn-outline btn-outline-success btn-active-light-success me-2 hidex"><small>Add</small></a>
-      <form action="." method="get" class="d-flex">
+      <form action="{{ route('pendaftaran.filter') }}" method="POST" class="d-flex">
         @csrf
-        <select name="jenjang" id="jenjang" class="form-select form-select-solid s2x mx-2">
-          <option>Pilih jenjang ...</option>
+        <select name="jenjang" id="jenjang" class="form-select form-select-solid s2x mx-2" required>
+          <option value="">Jenjang</option>
           <option value="sd">Sekolah Dasar</option>
           <option value="smp">Sekolah Menegah Pertama</option>
           <option value="sma">Sekolah Menegah Atas</option>
         </select>
-        <select name="tahun" id="tahun" class="form-select form-select-solid s2x mx-2">
-          <option>Pilih Tahun ...</option>
+        <select name="tahun" id="tahun" class="form-select form-select-solid s2x mx-2" required>
+          <option value="">Tahun</option>
           @php
           for($i=date('Y'); $i>=date('Y')-2; $i-=1){
           echo "<option value='$i'> $i </option>";
@@ -55,15 +55,6 @@
     {{-- 7771235312V451 --}}
     <div class="separator separator-dashed my-4"></div>
 
-    <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6" style="display:none;">
-      <li class="nav-item">
-        <a class="nav-link active" id="dataxtbl-tab" data-bs-toggle="tab" href="#dataxtbl">Link 1</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="formx-tab" data-bs-toggle="tab" href="#formx">Link 2</a>
-      </li>
-    </ul>
-
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane fade show active" id="dataxtbl" role="tabpanel">
 
@@ -71,24 +62,24 @@
 
           <table class="table table-row-bordered display nowrap" id="tblpenilaian" style="width:100%">
             <thead>
-              <tr>
-                <th style="align-items: center; width: 5px !important;">#</th>
-                <th width="1px">Kode Pendaftaran</th>
-                <th width="70px">Jenjang</th>
-                <th width="70px">Kondisi Orang Tua</th>
-                <th width="70px">Penghasilan Orang Tua/Wali</th>
-                <th width="70px">Kepemilikan Rumah</th>
-                <th width="70px">Kepemilikan Rumaha</th>
-                <th width="70px">Pengeluaran Perbulan</th>
-                <th width="70px">Hutang Bank</th>
-                <th width="70px">Hutang Lain</th>
-                <th width="70px">Tahun</th>
+              @if (!$pend == [])
+              <tr style="border-bottom: 1.3px solid rgb(50, 50, 50) !important">
+                <th class="fw-bolder">Kode Pendaftaran</th>
+                <th class="fw-bolder">Jenjang</th>
+                <th class="fw-bolder">Kondisi Orang Tua</th>
+                <th class="fw-bolder">Penghasilan Orang Tua/Wali</th>
+                <th class="fw-bolder">Kepemilikan Rumah</th>
+                <th class="fw-bolder">Kepemilikan Rumaha</th>
+                <th class="fw-bolder">Pengeluaran Perbulan</th>
+                <th class="fw-bolder">Hutang Bank</th>
+                <th class="fw-bolder">Hutang Lain</th>
+                <th class="fw-bolder">Tahun</th>
               </tr>
+              @endif
             </thead>
             <tbody>
-              @foreach ($pend as $p)
+              @forelse ($pend as $p)
               <tr>
-                <td>{{ $p->id }}</td>
                 <td>{{ strtoupper($p->pendaftar) }}</td>
                 <td>{{ strtoupper($p->jenjang) }}</td>
                 <td>@if ($p->kondisi_ortu == 1)
@@ -130,7 +121,13 @@
                   @endif</td>
                 <td>{{ $p->tahun }}</td>
               </tr>
-              @endforeach
+              @empty
+              @if (!$pend == [])
+              <tr class="text-center">
+                <td colspan="11" class="text-center">Data Tidak Tersedia</td>
+              </tr>
+              @endif
+              @endforelse
             </tbody>
           </table>
 
