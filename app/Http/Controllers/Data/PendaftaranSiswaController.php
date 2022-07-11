@@ -6,10 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\KriteriaModel;
 use App\Models\NormalisasiModel;
 use App\Models\SiswaModel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class PendaftaranSiswaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         $pend = [];
@@ -61,62 +67,58 @@ class PendaftaranSiswaController extends Controller
         $pendaftaran = new SiswaModel();
         $pendaftaran->pendaftar = strtolower(htmlspecialchars($request->pendaftar));
         $pendaftaran->jenjang = strtolower(htmlspecialchars($request->jenjang));
-        $pendaftaran->kondisi_ortu = strtolower(htmlspecialchars($request->kondisi_ortu));
-        $pendaftaran->penghasilan_ortu = strtolower(htmlspecialchars($request->penghasilan_ortu));
-        $pendaftaran->kepemilikan_rmh = strtolower(htmlspecialchars($request->kepemilikan_rmh));
-        $pendaftaran->kepemilikan_hrt = strtolower(htmlspecialchars($request->kepemilikan_hrt));
-        $pendaftaran->pengeluaran_bln = strtolower(htmlspecialchars($request->pengeluaran_bln));
-        $pendaftaran->hutang_bnk = strtolower(htmlspecialchars($request->hutang_bnk));
-        $pendaftaran->hutang_lain = strtolower(htmlspecialchars($request->hutang_lain));
+        $pendaftaran->kondisi_ortu = (int)(htmlspecialchars($request->kondisi_ortu));
+        $pendaftaran->penghasilan_ortu = (int)(htmlspecialchars($request->penghasilan_ortu));
+        $pendaftaran->kepemilikan_rmh = (int)(htmlspecialchars($request->kepemilikan_rmh));
+        $pendaftaran->kepemilikan_hrt = (int)(htmlspecialchars($request->kepemilikan_hrt));
+        $pendaftaran->pengeluaran_bln = (int)(htmlspecialchars($request->pengeluaran_bln));
+        $pendaftaran->hutang_bnk = (int)(htmlspecialchars($request->hutang_bnk));
+        $pendaftaran->hutang_lain = (int)(htmlspecialchars($request->hutang_lain));
         $pendaftaran->tahun = date('Y');
         $pendaftaran->save();
 
-        $dataPendaftar = SiswaModel::all();
-        $c1 = [];
-        $c2 = [];
-        $c3 = [];
-        $c4 = [];
-        $c5 = [];
-        $c6 = [];
-        $c7 = [];
-        foreach ($dataPendaftar as $pend) {
-            array_push($c1, $pend['kondisi_ortu']);
-            array_push($c2, $pend['penghasilan_ortu']);
-            array_push($c3, $pend['kepemilikan_rmh']);
-            array_push($c4, $pend['kepemilikan_hrt']);
-            array_push($c5, $pend['pengeluaran_bln']);
-            array_push($c6, $pend['hutang_bnk']);
-            array_push($c7, $pend['hutang_lain']);
+        $dataPendaftar = SiswaModel::where('jenjang', $pendaftaran->jenjang)->where('tahun', $pendaftaran->tahun)->get();
+        $kriteriaNew = KriteriaModel::all();
+        $c1 = $c2 = $c3 = $c4 = $c5 = $c6 = $c7 = [];
+        foreach ($dataPendaftar as $data) {
+            array_push($c1, $data['kondisi_ortu']);
+            array_push($c2, $data['penghasilan_ortu']);
+            array_push($c3, $data['kepemilikan_rmh']);
+            array_push($c4, $data['kepemilikan_hrt']);
+            array_push($c5, $data['pengeluaran_bln']);
+            array_push($c6, $data['hutang_bnk']);
+            array_push($c7, $data['hutang_lain']);
         }
 
-        foreach ($dataPendaftar as $pend) {
-            $kriteria = KriteriaModel::all();
-            $newNormal = NormalisasiModel::where('siswa_id', $pend->id)->first();
-            if ($newNormal == null) {
-                $normal = new NormalisasiModel();
-                $normal->siswa_id = $pend->id;
-                $normal->c1 = ((float)(min($c1) / $pend['kondisi_ortu']));
-                $normal->c2 = ((float)(min($c2)) / $pend['penghasilan_ortu']);
-                $normal->c3 = ((float)(min($c3)) / $pend['kepemilikan_rmh']);
-                $normal->c4 = ((float)(min($c4)) / $pend['kepemilikan_hrt']);
-                $normal->c5 = ((float)(min($c5)) / $pend['pengeluaran_bln']);
-                $normal->c6 = ((float)(min($c6)) / $pend['hutang_bnk']);
-                $normal->c7 = ((float)(min($c7)) / $pend['hutang_lain']);
-                $normal->hasil = ($normal->c1 * $kriteria['0']['nilai']) + ($normal->c2 * $kriteria['1']['nilai']) + ($normal->c3 * $kriteria['2']['nilai']) + ($normal->c4 * $kriteria['3']['nilai']) + ($normal->c5 * $kriteria['4']['nilai']) + ($normal->c6 * $kriteria['5']['nilai']) + ($normal->c7 * $kriteria['6']['nilai']);
+        foreach ($dataPendaftar as $data) {
+            // Get Data Normalisasi Sesuai Jenjang dan Tahun
+            $normal = NormalisasiModel::where('siswa_id', $data->id)->whereHas('siswa', function (Builder $query) use ($data) {
+                $query->where('jenjang', $data->jenjang)->where('tahun', $data->tahun);
+            })->first();
+            if ($normal) {
+                $normal->c1 = min($c1) / $normal->c1;
+                $normal->c2 = min($c2) / $normal->c2;
+                $normal->c3 = min($c3) / $normal->c3;
+                $normal->c4 = min($c4) / $normal->c4;
+                $normal->c5 = min($c5) / $normal->c5;
+                $normal->c6 = min($c6) / $normal->c6;
+                $normal->c7 = min($c7) / $normal->c7;
+                $normal->hasil = ($normal->c1 * $kriteriaNew[0]['nilai']) + ($normal->c2 * $kriteriaNew[1]['nilai']) + ($normal->c3 * $kriteriaNew[2]['nilai']) + ($normal->c4 * $kriteriaNew[3]['nilai']) + ($normal->c5 * $kriteriaNew[4]['nilai']) + ($normal->c6 * $kriteriaNew[5]['nilai']) + ($normal->c7 * $kriteriaNew[6]['nilai']);
                 $normal->save();
             } else {
-                $newNormal->c1 = ((float)(min($c1) / $pend['kondisi_ortu']));
-                $newNormal->c2 = ((float)(min($c2)) / $pend['penghasilan_ortu']);
-                $newNormal->c3 = ((float)(min($c3)) / $pend['kepemilikan_rmh']);
-                $newNormal->c4 = ((float)(min($c4)) / $pend['kepemilikan_hrt']);
-                $newNormal->c5 = ((float)(min($c5)) / $pend['pengeluaran_bln']);
-                $newNormal->c6 = ((float)(min($c6)) / $pend['hutang_bnk']);
-                $newNormal->c7 = ((float)(min($c7)) / $pend['hutang_lain']);
-                $newNormal->hasil = ($newNormal->c1 * $kriteria['0']['nilai']) + ($newNormal->c2 * $kriteria['1']['nilai']) + ($newNormal->c3 * $kriteria['2']['nilai']) + ($newNormal->c4 * $kriteria['3']['nilai']) + ($newNormal->c5 * $kriteria['4']['nilai']) + ($newNormal->c6 * $kriteria['5']['nilai']) + ($newNormal->c7 * $kriteria['6']['nilai']);
+                $newNormal = new NormalisasiModel();
+                $newNormal->siswa_id = $data['id'];
+                $newNormal->c1 = min($c1) / $data['kondisi_ortu'];
+                $newNormal->c2 = min($c2) / $data['penghasilan_ortu'];
+                $newNormal->c3 = min($c3) / $data['kepemilikan_rmh'];
+                $newNormal->c4 = min($c4) / $data['kepemilikan_hrt'];
+                $newNormal->c5 = min($c5) / $data['pengeluaran_bln'];
+                $newNormal->c6 = min($c6) / $data['hutang_bnk'];
+                $newNormal->c7 = min($c7) / $data['hutang_lain'];
+                $newNormal->hasil = ($newNormal->c1 * $kriteriaNew[0]['nilai']) + ($newNormal->c2 * $kriteriaNew[1]['nilai']) + ($newNormal->c3 * $kriteriaNew[2]['nilai']) + ($newNormal->c4 * $kriteriaNew[3]['nilai']) + ($newNormal->c5 * $kriteriaNew[4]['nilai']) + ($newNormal->c6 * $kriteriaNew[5]['nilai']) + ($newNormal->c7 * $kriteriaNew[6]['nilai']);
                 $newNormal->save();
             }
         }
-
         return redirect()->route('pendaftaran.index');
     }
 }

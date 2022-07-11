@@ -12,6 +12,7 @@ class NormalisasiModel extends Model
     protected $primaryKey = 'id';
     public $incrementing = true;
     protected $keyType = 'integer';
+    public $timestamps = false;
 
     protected $fillable = [
         'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'hasil'

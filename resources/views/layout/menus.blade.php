@@ -27,3 +27,17 @@
     <span class="menu-title">Data Kriteria</span>
   </a>
 </div>
+
+@if (Auth::user()->role == 'superadmin')
+<div class="menu-item me-lg-1">
+  <a href="{{ route('user.index') }}" class="menu-link py-3">
+    <span class="menu-title">Data User Login</span>
+  </a>
+</div>
+@endif
+
+<div class="menu-item me-lg-1 ms-5">
+  <a href="{{ route('logout') }}" class="btn btn-danger menu-link py-3">
+    <span class="menu-title">Logout</span>
+  </a>
+</div>

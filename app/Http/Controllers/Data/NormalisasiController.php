@@ -10,6 +10,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 class NormalisasiController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         $dataPendaftar = [];

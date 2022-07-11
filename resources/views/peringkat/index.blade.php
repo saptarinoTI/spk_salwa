@@ -24,7 +24,7 @@
       <h2 class="mb-1">Data Peringkat</h2>
     </div>
 
-    <form action="{{ route('peringkat.filter') }}" method="POST" class="d-flex">
+    <form action="{{ route('peringkat.cetak') }}" method="POST" class="d-flex">
       @csrf
       <select name="jenjang" id="jenjang" class="form-select form-select-solid s2x mx-2" required>
         <option value="">Pilih jenjang ...</option>
@@ -40,7 +40,7 @@
         }
         @endphp
       </select>
-      <button type="submit" class="btn btn-md btn-outline btn-outline-success btn-active-light-success me-2 hidex">Filter</button>
+      <button type="submit" class="btn btn-md btn-outline btn-outline-success btn-active-light-success me-2 hidex">Cetak</button>
     </form>
   </div>
 
